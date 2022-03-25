@@ -1,39 +1,38 @@
 package load.balance.strategy;
 
 import load.balance.AbstractLoadBalance;
-import load.balance.LoadBalance;
 import load.balance.Node;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * 加权最小活跃数（连接数）
+ * 加权滑动计数均值（EWMA）
  */
-public class WeightLeastActiveLoadBalance extends AbstractLoadBalance {
+public class WeightLeastEWMAActiveLoadBalance extends AbstractLoadBalance {
 
 
 
-    protected WeightLeastActiveLoadBalance(List<Node> nodes) {
+    protected WeightLeastEWMAActiveLoadBalance(List<Node> nodes) {
         super(nodes);
     }
 
     @Override
     public Node select(String request) {
-        int leastActive = -1;
+        double leastActive = -1;
         int[] leastIdx = new int[nodes.size()];
         int leastCount = 0;
         int totalWeight = 0;
         boolean sameWeight = true;
         int firstWeight = 0;
         for (int i = 0; i < nodes.size(); i++) {
-            if(leastActive == -1 || nodes.get(i).getCurActive() < leastActive) {
+            if(leastActive == -1 || nodes.get(i).getEWMAActive() < leastActive) {
                 leastIdx[0] = i;
                 leastCount = 1;
                 int weight = nodes.get(i).getWeight();
                 totalWeight = weight;
                 firstWeight = weight;
-            } else if (leastActive == nodes.get(i).getCurActive()) {
+            } else if (leastActive == nodes.get(i).getEWMAActive()) {
                 leastIdx[leastCount++] = i;
                 int weight = nodes.get(i).getWeight();
                 totalWeight += weight;
