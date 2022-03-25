@@ -72,7 +72,7 @@ public class Node {
         private long window;
         private long betaWindow;
         private double beta = -1D;
-        private long last = -1;
+        private long last;
         private double avg;
 
         public double getAvg() {
